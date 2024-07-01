@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using MyCloudProject.Common;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,9 +29,19 @@ namespace MyExperiment
         }
 
         // Download the dataset from my blob storage
-        public Task<string> DownloadInputAsync(string fileName)
+        public async Task<string> DownloadInputAsync(string fileName)
         {
-            throw new NotImplementedException();
+            BlobContainerClient container = new BlobContainerClient(_config.StorageConnectionString, _config.TrainingContainer);
+            await container.CreateIfNotExistsAsync();
+
+            // Geting a reference to a blob by its name.
+            BlobClient blob = container.GetBlobClient(fileName);
+
+            // Downloading the blob to the specified local file.
+            await blob.DownloadToAsync(fileName);
+
+            return fileName;
+
         }
 
         public IExerimentRequest ReceiveExperimentRequestAsync(CancellationToken token)
