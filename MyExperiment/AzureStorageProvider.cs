@@ -16,11 +16,14 @@ namespace MyExperiment
     public class AzureStorageProvider : IStorageProvider
     {
         private MyConfig _config;
+        private QueueClient _queueClient;
 
         public AzureStorageProvider(IConfigurationSection configSection)
         {
             _config = new MyConfig();
             configSection.Bind(_config);
+
+            _queueClient = new QueueClient(_config.StorageConnectionString, _config.Queue);
         }
 
         public Task CommitRequestAsync(IExerimentRequest request)
@@ -41,6 +44,7 @@ namespace MyExperiment
             await blob.DownloadToAsync(fileName);
 
             return fileName;
+
 
         }
 

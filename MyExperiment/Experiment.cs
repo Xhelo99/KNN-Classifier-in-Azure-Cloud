@@ -38,6 +38,12 @@ namespace MyExperiment
             // TODO read file
 
             // YOU START HERE WITH YOUR SE EXPERIMENT!!!!
+            Dictionary<string, List<double>> sequences = new Dictionary<string, List<double>>();
+
+            sequences.Add("S1", new List<double>(new double[] { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, }));
+
+            MultiSequenceLearning experiment = new MultiSequenceLearning();
+            var predictor = experiment.Run(sequences);
 
             ExperimentResult res = new ExperimentResult(this.config.GroupId, null);
 
