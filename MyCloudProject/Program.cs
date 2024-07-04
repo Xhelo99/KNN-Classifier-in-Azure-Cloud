@@ -17,7 +17,7 @@ namespace MyCloudProject
         /// <summary>
         /// Your project ID from the last semester.
         /// </summary>
-        private static string _projectName = "ML 22/23-6";
+        private static string _projectName = "ML 22/23-2";
 
         string test;
 

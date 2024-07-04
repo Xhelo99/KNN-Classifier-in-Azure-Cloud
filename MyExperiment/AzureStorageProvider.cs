@@ -2,12 +2,16 @@
 using Azure.Data.Tables;
 using Azure.Storage.Blobs;
 using Azure.Storage.Queues;
+using Azure.Storage.Queues.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using MyCloudProject.Common;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.IO;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,6 +21,7 @@ namespace MyExperiment
     {
         private MyConfig _config;
         private QueueClient _queueClient;
+        private ILogger logger;
 
         public AzureStorageProvider(IConfigurationSection configSection)
         {
@@ -48,10 +53,41 @@ namespace MyExperiment
 
         }
 
-        public IExerimentRequest ReceiveExperimentRequestAsync(CancellationToken token)
+        public async Task<IExerimentRequest> ReceiveExperimentRequestAsync(CancellationToken token)
         {
-            // Receive the message and make sure that it is serialized to IExperimentResult.
-            throw new NotImplementedException();
+            // Initialize a QueueClient for processing messages from a queue
+            QueueClient queueClient = new QueueClient(this._config.StorageConnectionString, this._config.Queue);
+
+            while (token.IsCancellationRequested == false)
+            {
+                // Receive a message from the queue
+                QueueMessage message = await queueClient.ReceiveMessageAsync();
+
+                if (message != null)
+                {
+                    try
+                    {
+                        // Processing of the the received message
+                        string msgTxt = Encoding.UTF8.GetString(message.Body.ToArray());
+                        logger?.LogInformation($"Received the message {msgTxt}");
+                        IExerimentRequest request = JsonSerializer.Deserialize<IExerimentRequest>(msgTxt);
+
+                        // Download input file, run the experiment, and upload results
+                        var inputFile = await DownloadInputAsync(request.InputFile);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        logger?.LogError(ex, "Something went wrong while running the experiment");
+                    }
+                }
+                else
+                {
+                    await Task.Delay(500);
+                    logger?.LogTrace("Queue empty...");
+                }
+            }
+            this.logger?.LogInformation("Cancel pressed. Exiting the listener loop.");
         }
 
 
