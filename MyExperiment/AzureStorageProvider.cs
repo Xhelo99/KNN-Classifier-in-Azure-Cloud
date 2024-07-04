@@ -70,11 +70,13 @@ namespace MyExperiment
                         // Processing of the the received message
                         string msgTxt = Encoding.UTF8.GetString(message.Body.ToArray());
                         logger?.LogInformation($"Received the message {msgTxt}");
-                        IExerimentRequest request = JsonSerializer.Deserialize<IExerimentRequest>(msgTxt);
+                        ExerimentRequestMessage request = JsonSerializer.Deserialize<ExerimentRequestMessage>(msgTxt);
+                        return request;
 
-                        // Download input file, run the experiment, and upload results
-                        var inputFile = await DownloadInputAsync(request.InputFile);
-
+                    }
+                    catch (JsonException jsonEx)
+                    {
+                        logger?.LogError(jsonEx, "JSON deserialization failed for the message");
                     }
                     catch (Exception ex)
                     {
@@ -88,6 +90,8 @@ namespace MyExperiment
                 }
             }
             this.logger?.LogInformation("Cancel pressed. Exiting the listener loop.");
+
+            return null;
         }
 
 
