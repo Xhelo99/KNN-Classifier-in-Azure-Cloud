@@ -54,7 +54,7 @@ namespace MyCloudProject
             while (tokeSrc.Token.IsCancellationRequested == false)
             {
                 // Step 3
-                IExerimentRequest request = storageProvider.ReceiveExperimentRequestAsync(tokeSrc.Token);
+                IExerimentRequest request = (IExerimentRequest)storageProvider.ReceiveExperimentRequestAsync(tokeSrc.Token);
 
                 if (request != null)
                 {
