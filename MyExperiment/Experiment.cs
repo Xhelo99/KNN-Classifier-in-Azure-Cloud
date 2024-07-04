@@ -9,6 +9,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace MyExperiment
 {
@@ -23,27 +24,29 @@ namespace MyExperiment
 
         private MyConfig config;
 
-        public Experiment(IConfigurationSection configSection, IStorageProvider storageProvider, ILogger log)
+        private string projectName;
+
+        public Experiment(IConfigurationSection configSection, IStorageProvider storageProvider, ILogger log, string projectName)
         {
             this.storageProvider = storageProvider;
             this.logger = log;
 
             config = new MyConfig();
             configSection.Bind(config);
+
+            this.projectName = projectName;
         }
 
 
         public Task<IExperimentResult> RunAsync(string inputData)
         {
-            // TODO read file
+            // Read  inputData file
+            var text = File.ReadAllText(inputData, Encoding.UTF8);
+            var sequences = JsonSerializer.Deserialize<Test>(text);
 
-            // YOU START HERE WITH YOUR SE EXPERIMENT!!!!
-            Dictionary<string, List<double>> sequences = new Dictionary<string, List<double>>();
-
-            sequences.Add("S1", new List<double>(new double[] { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, }));
-
+            //  This creates an instance of MultiSequenceLearning and run the method
             MultiSequenceLearning experiment = new MultiSequenceLearning();
-            var predictor = experiment.Run(sequences);
+            var predictor = experiment.Run(sequences.Train);
 
             ExperimentResult res = new ExperimentResult(this.config.GroupId, null);
 
@@ -51,7 +54,13 @@ namespace MyExperiment
 
             res.StartTimeUtc = DateTime.UtcNow;
 
-            // Run your experiment code here.
+            res.Timestamp = DateTime.UtcNow;
+            res.EndTimeUtc = DateTime.UtcNow;
+            res.ExperimentId = projectName;
+            var elapsedTime = res.EndTimeUtc - res.StartTimeUtc;
+            res.DurationSec = (long)elapsedTime.GetValueOrDefault().TotalSeconds;
+            res.InputFileUrl = inputData;
+            res.Accuracy = experiment.accuracy;
 
             return Task.FromResult<IExperimentResult>(res); // TODO...
         }

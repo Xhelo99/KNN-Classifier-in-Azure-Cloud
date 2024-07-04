@@ -47,7 +47,7 @@ namespace MyCloudProject
 
             IStorageProvider storageProvider = new AzureStorageProvider(cfgSec);
 
-            IExperiment experiment = new Experiment(cfgSec, storageProvider, logger/* put some additional config here */);
+            IExperiment experiment = new Experiment(cfgSec, storageProvider, logger, _projectName);
 
             //
             // Implements the step 3 in the architecture picture.
@@ -83,7 +83,7 @@ namespace MyCloudProject
                     }
                     catch (Exception ex)
                     {
-                        // logging
+                        logger?.LogError(ex, "Something went wrong while running the experiment");
                     }
                 }
                 else
