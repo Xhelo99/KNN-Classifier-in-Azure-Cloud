@@ -54,23 +54,26 @@ namespace MyCloudProject
             while (tokeSrc.Token.IsCancellationRequested == false)
             {
                 // Step 3
-                IExerimentRequest request = (IExerimentRequest)storageProvider.ReceiveExperimentRequestAsync(tokeSrc.Token);
+                IExerimentRequest request = await storageProvider.ReceiveExperimentRequestAsync(tokeSrc.Token);
 
                 if (request != null)
                 {
                     try
                     {
                         // logging
+                        logger?.LogInformation($"The message received {request}");
 
                         // Step 4.
                         var localFileWithInputArgs = await storageProvider.DownloadInputAsync(request.InputFile);
 
                         // logging
+                        logger?.LogInformation($"The local path where the dataset is stored {localFileWithInputArgs}");
 
                         // Here is your SE Project code started.(Between steps 4 and 5).
                         IExperimentResult result = await experiment.RunAsync(localFileWithInputArgs);
 
                         // logging
+                        logger?.LogInformation($"The experiment result {result}");
 
                         // Step 5.
                         await storageProvider.UploadResultAsync("outputfile", result);

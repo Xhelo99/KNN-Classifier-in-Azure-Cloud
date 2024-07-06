@@ -20,7 +20,6 @@ namespace MyExperiment
     public class AzureStorageProvider : IStorageProvider
     {
         private MyConfig _config;
-        private QueueClient _queueClient;
         private ILogger logger;
 
         public AzureStorageProvider(IConfigurationSection configSection)
