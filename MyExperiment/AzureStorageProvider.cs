@@ -83,11 +83,6 @@ namespace MyExperiment
                         logger?.LogError(ex, "Something went wrong while running the experiment");
                     }
                 }
-                else
-                {
-                    await Task.Delay(500);
-                    logger?.LogTrace("Queue empty...");
-                }
             }
             this.logger?.LogInformation("Cancel pressed. Exiting the listener loop.");
 
@@ -101,9 +96,48 @@ namespace MyExperiment
             throw new NotImplementedException();
         }
 
-        public Task UploadResultAsync(string experimentName, IExperimentResult result)
+        public async Task UploadResultAsync(string experimentName, IExperimentResult result)
         {
-            throw new NotImplementedException();
+            try
+            {
+                // Creating Azure Table
+                TableServiceClient tableServiceClient = new TableServiceClient(this._config.StorageConnectionString);
+                TableClient tableClient = tableServiceClient.GetTableClient(this._config.ResultTable);
+                await tableClient.CreateIfNotExistsAsync();
+
+                string partitionKey = result.ExperimentId;
+
+                // Initialize a row key suffix number.
+                int suffixNum = 1;
+                for (int index = 0; index < 1; index++)
+                {
+                    string rowKey = "KNN" + "_" + suffixNum.ToString();
+
+                    // Creating entity for the experiment result.
+                    var tableEntity = new ExperimentResult(partitionKey, rowKey)
+                    {
+                        PartitionKey = result.ExperimentId,
+                        RowKey = rowKey,
+                        ExperimentId = result.ExperimentId,
+                        StartTimeUtc = result.StartTimeUtc,
+                        EndTimeUtc = result.EndTimeUtc,
+                        Accuracy = result.Accuracy,
+                        DurationSec = result.DurationSec,
+                    };
+
+                    // Adding the newly created entity to the Azure Table.
+                    await tableClient.AddEntityAsync(tableEntity);
+                    suffixNum++;
+
+                    // Adding logging to inspect the data being inserted.
+                    Console.WriteLine($"Inserted entity: PartitionKey={tableEntity.PartitionKey}, RowKey={tableEntity.RowKey},Accuracy={tableEntity.Accuracy}");
+                }
+                Console.WriteLine("Uploaded to Table Storage successfully");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine("Failed to upload to Table Storage", ex.ToString());
+            }
         }
     }
 

@@ -13,6 +13,7 @@ namespace MyExperiment
 {
     public class MultiSequenceLearning
     {
+        public double accuracy;
         /// <summary>
         /// Runs the learning of sequences.
         /// </summary>
@@ -266,7 +267,7 @@ namespace MyExperiment
                     // The first element (a single element) in the sequence cannot be predicted
                     double maxPossibleAccuraccy = (double)((double)sequenceKeyPair.Value.Count - 1) / (double)sequenceKeyPair.Value.Count * 100.0;
 
-                    double accuracy = (double)matches / (double)sequenceKeyPair.Value.Count * 100.0;
+                    accuracy = (double)matches / (double)sequenceKeyPair.Value.Count * 100.0;
 
                     Debug.WriteLine($"Cycle: {cycle}\tMatches={matches} of {sequenceKeyPair.Value.Count}\t {accuracy}%");
 

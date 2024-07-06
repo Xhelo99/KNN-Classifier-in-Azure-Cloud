@@ -14,7 +14,12 @@ namespace MyCloudProject.Common
 
         DateTime? EndTimeUtc { get; set; }
 
-        public TimeSpan Duration { get; set; }         
+        public TimeSpan Duration { get; set; }
+
+        public long DurationSec { get; set; }
+
+        public double Accuracy { get; set; }
+
     }
 
 }
