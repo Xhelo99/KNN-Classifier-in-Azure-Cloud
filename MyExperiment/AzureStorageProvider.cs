@@ -28,12 +28,13 @@ namespace MyExperiment
             _config = new MyConfig();
             configSection.Bind(_config);
 
-            _queueClient = new QueueClient(_config.StorageConnectionString, _config.Queue);
         }
 
-        public Task CommitRequestAsync(IExerimentRequest request)
+        public async Task CommitRequestAsync(IExerimentRequest request)
         {
-            throw new NotImplementedException();
+            // Delete the message from the 
+            var queueClient = new QueueClient(_config.StorageConnectionString, this._config.Queue);
+            await queueClient.DeleteMessageAsync(request.MessageId, request.MessageReceipt);
         }
 
         // Download the dataset from my blob storage
