@@ -106,26 +106,25 @@ namespace MyExperiment
                 TableClient tableClient = tableServiceClient.GetTableClient(tableName: this._config.ResultTable);
                 await tableClient.CreateIfNotExistsAsync();
 
-                string partitionKey = result.ExperimentId;
-                string rowKey = "KnnClassifier";
-
-                var outputTable = new ExperimentResult(partitionKey, rowKey)
-                {
-                    PartitionKey = result.ExperimentId,
-                    RowKey = rowKey,
-                    ExperimentId = result.ExperimentId,
-                    StartTimeUtc = result.StartTimeUtc,
-                    EndTimeUtc = result.EndTimeUtc,
-                    Accuracy = result.Accuracy,
-                    DurationSec = result.DurationSec,
-                };
+                // Creating a table entity from the result
+                var entity = new TableEntity(experimentName, "KnnClassifier")
+             {
+                { "StartTimeUtc", result.StartTimeUtc },
+                { "EndTimeUtc", result.EndTimeUtc },
+                { "ExperimentId", result.ExperimentId },
+                { "DurationSec", result.DurationSec },
+                { "InputFileUrl", result.InputFileUrl },
+                { "Accuracy", result.Accuracy },
+                { "OutputFiles", string.Join(",", result.OutputFiles) }
+            };
+              
                 // Adding the newly created entity to the Azure Table.
-                await tableClient.AddEntityAsync(outputTable);
+                await tableClient.AddEntityAsync(entity);
                 Console.WriteLine("Uploaded to Table Storage successfully");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("Failed to upload to Table Storage", ex.ToString());
+                Console.Error.WriteLine("Failed to upload to Table Storage: " + ex.ToString());
             }
         }
     }

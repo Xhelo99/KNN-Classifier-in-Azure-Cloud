@@ -73,7 +73,7 @@ namespace MyCloudProject
                         IExperimentResult result = await experiment.RunAsync(localFileWithInputArgs);
 
                         // logging
-                        logger?.LogInformation($"The experiment result {result}");
+                        logger?.LogInformation($"The experiment has finished and now the results will be uploaded to table.");
 
                         // Step 5.
                         await storageProvider.UploadResultAsync("outputfile", result);

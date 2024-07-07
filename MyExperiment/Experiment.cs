@@ -51,7 +51,7 @@ namespace MyExperiment
             //  This creates an instance of MultiSequenceLearning and run the method
             MultiSequenceLearning experiment = new MultiSequenceLearning();
 
-            ExperimentResult res = new ExperimentResult(this.config.GroupId, null);
+            ExperimentResult res = new ExperimentResult(this.config.GroupId, "1");
 
             res.StartTimeUtc = DateTime.UtcNow;
 
