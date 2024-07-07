@@ -40,6 +40,9 @@ namespace MyExperiment
 
         public Task<IExperimentResult> RunAsync(string inputData)
         {
+            // Create output file 
+            var outputFile = "output.txt";
+
             // Read  inputData file
             var text = File.ReadAllText(inputData, Encoding.UTF8);
             var sequences = JsonSerializer.Deserialize<Test>(text);
@@ -61,6 +64,7 @@ namespace MyExperiment
             res.DurationSec = (long)elapsedTime.GetValueOrDefault().TotalSeconds;
             res.InputFileUrl = inputData;
             res.Accuracy = experiment.accuracy;
+            res.OutputFilesProxy = new string[] { outputFile };
 
             return Task.FromResult<IExperimentResult>(res); // TODO...
         }

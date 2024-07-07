@@ -20,6 +20,8 @@ namespace MyCloudProject.Common
 
         public double Accuracy { get; set; }
 
+        public string[] OutputFiles { get; set; }
+
     }
 
 }
