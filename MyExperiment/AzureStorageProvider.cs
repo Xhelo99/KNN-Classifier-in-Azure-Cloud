@@ -29,12 +29,13 @@ namespace MyExperiment
 
         }
 
-        public async Task CommitRequestAsync(IExerimentRequest request)
+      /*  public async Task CommitRequestAsync(IExerimentRequest request)
         {
             // Delete the message from the 
             var queueClient = new QueueClient(_config.StorageConnectionString, this._config.Queue);
             await queueClient.DeleteMessageAsync(request.MessageId, request.MessageReceipt);
         }
+      */
 
         // Download the dataset from my blob storage
         public async Task<string> DownloadInputAsync(string fileName)
@@ -100,38 +101,26 @@ namespace MyExperiment
         {
             try
             {
-                // Creating Azure Table
+                // New instance of the TableClient class
                 TableServiceClient tableServiceClient = new TableServiceClient(this._config.StorageConnectionString);
-                TableClient tableClient = tableServiceClient.GetTableClient(this._config.ResultTable);
+                TableClient tableClient = tableServiceClient.GetTableClient(tableName: this._config.ResultTable);
                 await tableClient.CreateIfNotExistsAsync();
 
                 string partitionKey = result.ExperimentId;
+                string rowKey = "KnnClassifier";
 
-                // Initialize a row key suffix number.
-                int suffixNum = 1;
-                for (int index = 0; index < 1; index++)
+                var outputTable = new ExperimentResult(partitionKey, rowKey)
                 {
-                    string rowKey = "KNN" + "_" + suffixNum.ToString();
-
-                    // Creating entity for the experiment result.
-                    var tableEntity = new ExperimentResult(partitionKey, rowKey)
-                    {
-                        PartitionKey = result.ExperimentId,
-                        RowKey = rowKey,
-                        ExperimentId = result.ExperimentId,
-                        StartTimeUtc = result.StartTimeUtc,
-                        EndTimeUtc = result.EndTimeUtc,
-                        Accuracy = result.Accuracy,
-                        DurationSec = result.DurationSec,
-                    };
-
-                    // Adding the newly created entity to the Azure Table.
-                    await tableClient.AddEntityAsync(tableEntity);
-                    suffixNum++;
-
-                    // Adding logging to inspect the data being inserted.
-                    Console.WriteLine($"Inserted entity: PartitionKey={tableEntity.PartitionKey}, RowKey={tableEntity.RowKey},Accuracy={tableEntity.Accuracy}");
-                }
+                    PartitionKey = result.ExperimentId,
+                    RowKey = rowKey,
+                    ExperimentId = result.ExperimentId,
+                    StartTimeUtc = result.StartTimeUtc,
+                    EndTimeUtc = result.EndTimeUtc,
+                    Accuracy = result.Accuracy,
+                    DurationSec = result.DurationSec,
+                };
+                // Adding the newly created entity to the Azure Table.
+                await tableClient.AddEntityAsync(outputTable);
                 Console.WriteLine("Uploaded to Table Storage successfully");
             }
             catch (Exception ex)

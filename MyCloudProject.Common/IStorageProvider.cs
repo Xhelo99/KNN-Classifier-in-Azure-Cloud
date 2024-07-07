@@ -40,7 +40,7 @@ namespace MyCloudProject.Common
         /// </summary>
         /// <param name="request">The requests received by <see cref="nameof(IStorageProvider.ReceiveExperimentRequestAsync)"/>.</param>
         /// <returns></returns>
-        Task CommitRequestAsync(IExerimentRequest request);
+       // Task CommitRequestAsync(IExerimentRequest request);
 
     }
 }

@@ -46,16 +46,18 @@ namespace MyExperiment
             // Read  inputData file
             var text = File.ReadAllText(inputData, Encoding.UTF8);
             var sequences = JsonSerializer.Deserialize<Test>(text);
+            
 
             //  This creates an instance of MultiSequenceLearning and run the method
             MultiSequenceLearning experiment = new MultiSequenceLearning();
-            var predictor = experiment.Run(sequences.Train);
 
             ExperimentResult res = new ExperimentResult(this.config.GroupId, null);
 
-            // logging, logging and logging
-
             res.StartTimeUtc = DateTime.UtcNow;
+
+            experiment.Run(sequences.Train);
+
+            // logging, logging and logging
 
             res.Timestamp = DateTime.UtcNow;
             res.EndTimeUtc = DateTime.UtcNow;
@@ -64,7 +66,7 @@ namespace MyExperiment
             res.DurationSec = (long)elapsedTime.GetValueOrDefault().TotalSeconds;
             res.InputFileUrl = inputData;
             res.Accuracy = experiment.accuracy;
-            res.OutputFilesProxy = new string[] { outputFile };
+            res.OutputFiles = new string[] { outputFile };
 
             return Task.FromResult<IExperimentResult>(res); // TODO...
         }

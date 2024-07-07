@@ -14,6 +14,7 @@ namespace MyExperiment
     public class MultiSequenceLearning
     {
         public double accuracy;
+
         /// <summary>
         /// Runs the learning of sequences.
         /// </summary>

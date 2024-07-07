@@ -19,7 +19,7 @@ namespace MyCloudProject
         /// </summary>
         private static string _projectName = "ML 22/23-2";
 
-        string test;
+        //string test;
 
         static async Task Main(string[] args)
         {
@@ -80,7 +80,7 @@ namespace MyCloudProject
 
                         // logging
 
-                        await storageProvider.CommitRequestAsync(request);
+                       // await storageProvider.CommitRequestAsync(request);
 
                         // loggingx
                     }
