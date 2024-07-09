@@ -61,7 +61,7 @@ namespace MyCloudProject
                     try
                     {
                         // logging
-                        logger?.LogInformation($"The message received {request}");
+                        logger?.LogInformation($"The message with Id:{request.ExperimentId} is received ");
 
                         // Step 4.
                         var localFileWithInputArgs = await storageProvider.DownloadInputAsync(request.InputFile);
@@ -80,7 +80,7 @@ namespace MyCloudProject
 
                         // logging
 
-                       // await storageProvider.CommitRequestAsync(request);
+                       await storageProvider.CommitRequestAsync(request);
 
                         // loggingx
                     }
