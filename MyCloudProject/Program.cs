@@ -60,29 +60,29 @@ namespace MyCloudProject
                 {
                     try
                     {
-                        // logging
-                        logger?.LogInformation($"The message with Id:{request.ExperimentId} is received ");
+                        
+                        logger?.LogInformation($"The message with Id: {request.ExperimentId} is received. and" +
+                            $"the dataset will be downloaded from Blob storage.");
 
-                        // Step 4.
+                        //Download dataset from Blob storage
                         var localFileWithInputArgs = await storageProvider.DownloadInputAsync(request.InputFile);
+          
+                        logger?.LogInformation($"The dataset {localFileWithInputArgs} has successfully been downloaded.");
 
-                        // logging
-                        logger?.LogInformation($"The local path where the dataset is stored {localFileWithInputArgs}");
-
-                        // Here is your SE Project code started.(Between steps 4 and 5).
+                        // Run SE Project code
                         IExperimentResult result = await experiment.RunAsync(localFileWithInputArgs);
 
-                        // logging
                         logger?.LogInformation($"The experiment has finished and now the results will be uploaded to table.");
 
-                        // Step 5.
+                        // Upload the results to the table
                         await storageProvider.UploadResultAsync("outputfile", result);
 
-                        // logging
+                        logger?.LogInformation("Uploaded to Table Storage successfully");
 
-                       await storageProvider.CommitRequestAsync(request);
+                        // Delete the message from the queue
+                        await storageProvider.CommitRequestAsync(request);
 
-                        // loggingx
+                        logger?.LogInformation("The message has been deleted from the queue and the program is waiting for another message.");
                     }
                     catch (Exception ex)
                     {

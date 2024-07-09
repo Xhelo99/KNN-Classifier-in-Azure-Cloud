@@ -124,7 +124,7 @@ namespace MyExperiment
               
                 // Adding the newly created entity to the Azure Table.
                 await tableClient.AddEntityAsync(entity);
-                Console.WriteLine("Uploaded to Table Storage successfully");
+               
             }
             catch (Exception ex)
             {
