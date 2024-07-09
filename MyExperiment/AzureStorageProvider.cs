@@ -29,13 +29,13 @@ namespace MyExperiment
 
         }
 
-      /*  public async Task CommitRequestAsync(IExerimentRequest request)
+        public async Task CommitRequestAsync(IExerimentRequest request)
         {
             // Delete the message from the 
             var queueClient = new QueueClient(_config.StorageConnectionString, this._config.Queue);
             await queueClient.DeleteMessageAsync(request.MessageId, request.MessageReceipt);
         }
-      */
+      
 
         // Download the dataset from my blob storage
         public async Task<string> DownloadInputAsync(string fileName)
@@ -59,8 +59,7 @@ namespace MyExperiment
             // Initialize a QueueClient for processing messages from a queue
             QueueClient queueClient = new QueueClient(this._config.StorageConnectionString, this._config.Queue);
 
-            while (token.IsCancellationRequested == false)
-            {
+           
                 // Receive a message from the queue
                 QueueMessage message = await queueClient.ReceiveMessageAsync();
 
@@ -72,6 +71,8 @@ namespace MyExperiment
                         string msgTxt = Encoding.UTF8.GetString(message.Body.ToArray());
                         logger?.LogInformation($"Received the message {msgTxt}");
                         ExerimentRequestMessage request = JsonSerializer.Deserialize<ExerimentRequestMessage>(msgTxt);
+                        request.MessageId = message.MessageId;
+                        request.MessageReceipt = message.PopReceipt;
                         return request;
 
                     }
@@ -84,8 +85,11 @@ namespace MyExperiment
                         logger?.LogError(ex, "Something went wrong while running the experiment");
                     }
                 }
-            }
-            this.logger?.LogInformation("Cancel pressed. Exiting the listener loop.");
+                else
+                {
+                    this.logger?.LogInformation("The message is null");
+                }
+            
 
             return null;
         }
@@ -115,7 +119,7 @@ namespace MyExperiment
                 { "DurationSec", result.DurationSec },
                 { "InputFileUrl", result.InputFileUrl },
                 { "Accuracy", result.Accuracy },
-                { "OutputFiles", string.Join(",", result.OutputFiles) }
+                //{ "OutputFiles", string.Join(",", result.OutputFiles) }
             };
               
                 // Adding the newly created entity to the Azure Table.
