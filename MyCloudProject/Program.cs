@@ -61,8 +61,8 @@ namespace MyCloudProject
                     try
                     {
                         
-                        logger?.LogInformation($"The message with Id: {request.ExperimentId} is received. and" +
-                            $"the dataset will be downloaded from Blob storage.");
+                        logger?.LogInformation($"The message with Id: {request.ExperimentId} is received. " +
+                            $"The dataset will be downloaded from Blob storage.");
 
                         //Download dataset from Blob storage
                         var localFileWithInputArgs = await storageProvider.DownloadInputAsync(request.InputFile);
@@ -74,8 +74,11 @@ namespace MyCloudProject
 
                         logger?.LogInformation($"The experiment has finished and now the results will be uploaded to table.");
 
-                        // Upload the results to the table
+                        // Upload the output to blob container. 
                         await storageProvider.UploadResultAsync("outputfile", result);
+
+                        // Upload the results to the table
+                        await storageProvider.UploadExperimentResult(result);
 
                         logger?.LogInformation("Uploaded to Table Storage successfully");
 
