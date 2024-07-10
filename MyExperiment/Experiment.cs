@@ -10,6 +10,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
+using System.Diagnostics;
 
 namespace MyExperiment
 {
@@ -55,9 +56,14 @@ namespace MyExperiment
 
             res.StartTimeUtc = DateTime.UtcNow;
 
-            experiment.Run(sequences.Train);
+            // Add a trace listener to capture debug output
+            using (StreamWriter writer = new StreamWriter(outputFile))
+            {
+                Trace.Listeners.Add(new TextWriterTraceListener(writer));
+                Trace.AutoFlush = true;
+                experiment.Run(sequences.Train);
 
-            // logging, logging and logging
+            }         
 
             res.Timestamp = DateTime.UtcNow;
             res.EndTimeUtc = DateTime.UtcNow;
