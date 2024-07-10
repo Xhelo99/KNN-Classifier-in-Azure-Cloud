@@ -42,5 +42,7 @@ namespace MyCloudProject.Common
         /// <returns></returns>
        Task CommitRequestAsync(IExerimentRequest request);
 
+        Task UploadExperimentResult(IExperimentResult result);
+
     }
 }
