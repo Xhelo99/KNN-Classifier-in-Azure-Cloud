@@ -46,28 +46,22 @@ namespace MyCloudProject
             logger?.LogInformation($"{DateTime.Now} -  Started experiment: {_projectName}");
 
             IStorageProvider storageProvider = new AzureStorageProvider(cfgSec);
-            
+            IExperiment experiment = new Experiment(cfgSec, storageProvider, logger);
+
             // Implements the step 3 in the architecture picture.
             while (tokeSrc.Token.IsCancellationRequested == false)
             {
                 // Wait for the queue message
                 IExerimentRequest request = await storageProvider.ReceiveExperimentRequestAsync(tokeSrc.Token);
 
-                IExperiment experiment = new Experiment(
-                 cfgSec,
-                 storageProvider,
-                 logger,
-                 _projectName,
-                 request.ExperimentId,
-                 request.Name,
-                 request.Description
-                 );
-
+                // Method to set the messaga parameters to Experiment class
+                experiment.setExperimentDetails(request.ExperimentId, request.Name, request.Description);
+           
                 if (request != null)
                 {
                     try
                     {
-                        
+
                         logger?.LogInformation($"The message with Id: {request.ExperimentId} is received. " +
                             $"The dataset will be downloaded from Blob storage.");
 

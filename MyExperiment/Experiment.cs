@@ -25,34 +25,26 @@ namespace MyExperiment
 
         private MyConfig config;
 
-        private string projectName;
-
         private string experimentId;
 
         private string experimentName;
 
         private string experimentDescription;
-        public Experiment(
-            IConfigurationSection configSection, 
-            IStorageProvider storageProvider, 
-            ILogger log, string projectName, 
-            string experimentId, 
-            string experimentName,
-            string experimentDecription
-            )
+        public Experiment(IConfigurationSection configSection, IStorageProvider storageProvider, ILogger log)
         {
             this.storageProvider = storageProvider;
             this.logger = log;
 
             config = new MyConfig();
-            configSection.Bind(config);
-
-            this.projectName = projectName;
+            configSection.Bind(config);               
+        }
+       
+         // Method to set experiment details
+       public void setExperimentDetails(string experimentId, string experimentName, string experimentDescription) 
+        {
             this.experimentId = experimentId;
             this.experimentName = experimentName;
-            this.experimentDescription = experimentDecription;
-            
-
+            this.experimentDescription = experimentDescription;
         }
 
 

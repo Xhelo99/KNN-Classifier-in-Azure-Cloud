@@ -20,5 +20,13 @@ namespace MyCloudProject.Common
         /// <returns>The result.</returns>
         Task<IExperimentResult> RunAsync(string inputData);
 
+        /// <summary>
+        /// Sets the details of the experiment.
+        /// </summary>
+        /// <param name="experimentId">The ID of the experiment.</param>
+        /// <param name="experimentName">The name of the experiment.</param>
+        /// <param name="experimentDescription">The description of the experiment.</param>
+        void setExperimentDetails(string experimentId, string experimentName, string experimentDescription);
+
     }
 }
