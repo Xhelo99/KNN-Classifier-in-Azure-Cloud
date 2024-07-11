@@ -46,15 +46,22 @@ namespace MyCloudProject
             logger?.LogInformation($"{DateTime.Now} -  Started experiment: {_projectName}");
 
             IStorageProvider storageProvider = new AzureStorageProvider(cfgSec);
-
-            IExperiment experiment = new Experiment(cfgSec, storageProvider, logger, _projectName);
-
             
             // Implements the step 3 in the architecture picture.
             while (tokeSrc.Token.IsCancellationRequested == false)
             {
                 // Wait for the queue message
                 IExerimentRequest request = await storageProvider.ReceiveExperimentRequestAsync(tokeSrc.Token);
+
+                IExperiment experiment = new Experiment(
+                 cfgSec,
+                 storageProvider,
+                 logger,
+                 _projectName,
+                 request.ExperimentId,
+                 request.Name,
+                 request.Description
+                 );
 
                 if (request != null)
                 {

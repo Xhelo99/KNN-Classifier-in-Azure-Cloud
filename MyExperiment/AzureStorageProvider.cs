@@ -91,8 +91,8 @@ namespace MyExperiment
                 {
                     this.logger?.LogInformation("The message is null");
                 }
-            
 
+            logger?.LogError("The message sent it is not correctly formated. Please try again.");
             return null;
         }
 
@@ -113,12 +113,14 @@ namespace MyExperiment
                 // Creating a table entity from the result
                 var entity = new TableEntity( this._config.ResultTable, uniqueRowKey)
              {
+                { "ExperimentId", result.ExperimentId },
+                { "Name", result.Name },
+                { "Decription", result.Description },
                 { "StartTimeUtc", result.StartTimeUtc },
                 { "EndTimeUtc", result.EndTimeUtc },
-                { "ExperimentId", result.ExperimentId },
                 { "DurationSec", result.DurationSec },
                 { "InputFileUrl", result.InputFileUrl },
-                { "InputFileUrl", result.OutputFileUrl },
+                { "OutputFileUrl", result.OutputFileUrl },
                 { "Accuracy", result.Accuracy },
             };
 

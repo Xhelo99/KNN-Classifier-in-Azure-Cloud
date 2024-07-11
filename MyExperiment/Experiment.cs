@@ -27,7 +27,19 @@ namespace MyExperiment
 
         private string projectName;
 
-        public Experiment(IConfigurationSection configSection, IStorageProvider storageProvider, ILogger log, string projectName)
+        private string experimentId;
+
+        private string experimentName;
+
+        private string experimentDescription;
+        public Experiment(
+            IConfigurationSection configSection, 
+            IStorageProvider storageProvider, 
+            ILogger log, string projectName, 
+            string experimentId, 
+            string experimentName,
+            string experimentDecription
+            )
         {
             this.storageProvider = storageProvider;
             this.logger = log;
@@ -36,6 +48,11 @@ namespace MyExperiment
             configSection.Bind(config);
 
             this.projectName = projectName;
+            this.experimentId = experimentId;
+            this.experimentName = experimentName;
+            this.experimentDescription = experimentDecription;
+            
+
         }
 
 
@@ -67,12 +84,16 @@ namespace MyExperiment
 
             res.Timestamp = DateTime.UtcNow;
             res.EndTimeUtc = DateTime.UtcNow;
-            res.ExperimentId = projectName;
+            res.ExperimentId = experimentId;
+            res.Name = experimentName;
+            res.Description = experimentDescription;
             var elapsedTime = res.EndTimeUtc - res.StartTimeUtc;
             res.DurationSec = (long)elapsedTime.GetValueOrDefault().TotalSeconds;
             res.InputFileUrl = inputData;
+            res.OutputFileUrl = outputFile;
             res.Accuracy = experiment.accuracy;
             res.OutputFiles = new string[] { outputFile };
+            
 
             return Task.FromResult<IExperimentResult>(res); // TODO...
         }

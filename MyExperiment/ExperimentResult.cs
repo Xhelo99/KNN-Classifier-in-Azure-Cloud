@@ -44,5 +44,7 @@ namespace MyExperiment
         public double Accuracy { get; set; }
 
         public TimeSpan Duration { get; set; }
+
+        public string OutputFileUrl { get; set; }
     }
 }
