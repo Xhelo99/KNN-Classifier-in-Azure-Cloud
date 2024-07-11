@@ -17,7 +17,7 @@ namespace MyCloudProject
         /// <summary>
         /// Your project ID from the last semester.
         /// </summary>
-        private static string _projectName = "ML 22/23-2";
+        private static string _projectName = "ML 22/23-2 Investigate and Implement KNN Classifier";
 
         //string test;
 
@@ -49,11 +49,11 @@ namespace MyCloudProject
 
             IExperiment experiment = new Experiment(cfgSec, storageProvider, logger, _projectName);
 
-            //
+            
             // Implements the step 3 in the architecture picture.
             while (tokeSrc.Token.IsCancellationRequested == false)
             {
-                // Step 3
+                // Wait for the queue message
                 IExerimentRequest request = await storageProvider.ReceiveExperimentRequestAsync(tokeSrc.Token);
 
                 if (request != null)
@@ -64,18 +64,22 @@ namespace MyCloudProject
                         logger?.LogInformation($"The message with Id: {request.ExperimentId} is received. " +
                             $"The dataset will be downloaded from Blob storage.");
 
-                        //Download dataset from Blob storage
+                        // Download dataset from Blob storage
                         var localFileWithInputArgs = await storageProvider.DownloadInputAsync(request.InputFile);
           
-                        logger?.LogInformation($"The dataset {localFileWithInputArgs} has successfully been downloaded.");
+                        logger?.LogInformation($"The dataset {localFileWithInputArgs} has successfully been downloaded. " +
+                            $"The SE project will start.");
 
                         // Run SE Project code
                         IExperimentResult result = await experiment.RunAsync(localFileWithInputArgs);
 
-                        logger?.LogInformation($"The experiment has finished and now the results will be uploaded to table.");
+                        logger?.LogInformation($"The experiment has finished and the experiment output will be uploaded " +
+                            $"to the container.");
 
-                        // Upload the output to blob container. 
+                        // Upload the experiment output to blob container. 
                         await storageProvider.UploadResultAsync("outputfile", result);
+
+                        logger?.LogInformation("The result is uploading to the Table Storage.");
 
                         // Upload the results to the table
                         await storageProvider.UploadExperimentResult(result);
