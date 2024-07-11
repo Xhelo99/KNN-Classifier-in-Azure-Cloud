@@ -81,18 +81,14 @@ namespace MyExperiment
                     catch (JsonException jsonEx)
                     {
                         logger?.LogError(jsonEx, "JSON deserialization failed for the message");
-                    }
-                    catch (Exception ex)
-                    {
-                        logger?.LogError(ex, "The message sent it is not correctly formated. Please try again.");
-                    }
+                        Console.Error.WriteLine("The message sent it is not correctly formated. Please send another message.");
+                }
                 }
                 else
                 {
                     this.logger?.LogInformation("The message is null");
                 }
 
-            logger?.LogError("The message sent it is not correctly formated. Please try again.");
             return null;
         }
 

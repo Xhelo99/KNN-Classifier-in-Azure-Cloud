@@ -100,6 +100,7 @@ namespace MyCloudProject
                 {
                     await Task.Delay(500);
                     logger?.LogTrace("Queue empty...");
+                    
                 }
             }
 
