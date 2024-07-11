@@ -55,9 +55,10 @@ namespace MyExperiment
 
         }
 
+        // Await the queue message and process it 
         public async Task<IExerimentRequest> ReceiveExperimentRequestAsync(CancellationToken token)
         {
-            // Initialize a QueueClient for processing messages from a queue
+            
             QueueClient queueClient = new QueueClient(this._config.StorageConnectionString, this._config.Queue);
 
            
@@ -70,7 +71,6 @@ namespace MyExperiment
                     {
                         // Processing of the the received message
                         string msgTxt = Encoding.UTF8.GetString(message.Body.ToArray());
-                        logger?.LogInformation($"Received the message {msgTxt}");
                         ExerimentRequestMessage request = JsonSerializer.Deserialize<ExerimentRequestMessage>(msgTxt);
                         request.MessageId = message.MessageId;
                         request.MessageReceipt = message.PopReceipt;
@@ -83,7 +83,7 @@ namespace MyExperiment
                     }
                     catch (Exception ex)
                     {
-                        logger?.LogError(ex, "Something went wrong while running the experiment");
+                        logger?.LogError(ex, "The message sent it is not correctly formated. Please try again.");
                     }
                 }
                 else
