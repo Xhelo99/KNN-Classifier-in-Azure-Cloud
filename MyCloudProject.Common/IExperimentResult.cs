@@ -10,6 +10,8 @@ namespace MyCloudProject.Common
         string ExperimentId { get; set; }
         public string InputFileUrl { get; set; }
 
+        public string OutputFileUrl { get; set; }
+
         DateTime? StartTimeUtc { get; set; }
 
         DateTime? EndTimeUtc { get; set; }

@@ -30,9 +30,10 @@ namespace MyExperiment
 
         }
 
+        // Delete the message from the Queue
         public async Task CommitRequestAsync(IExerimentRequest request)
         {
-            // Delete the message from the 
+            
             var queueClient = new QueueClient(_config.StorageConnectionString, this._config.Queue);
             await queueClient.DeleteMessageAsync(request.MessageId, request.MessageReceipt);
         }
@@ -114,8 +115,8 @@ namespace MyExperiment
                 { "ExperimentId", result.ExperimentId },
                 { "DurationSec", result.DurationSec },
                 { "InputFileUrl", result.InputFileUrl },
+                { "InputFileUrl", result.OutputFileUrl },
                 { "Accuracy", result.Accuracy },
-                //{ "OutputFiles", string.Join(",", result.OutputFiles) }
             };
 
                 // Adding the newly created entity to the Azure Table.
@@ -124,26 +125,25 @@ namespace MyExperiment
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("Failed to upload to Table Storage: " + ex.ToString());
+                Console.Error.WriteLine("Failed to upload to Table Storage: ", ex.ToString());
             }
             
         }
 
+        // Upload the experiment output file to the blob container
         public async Task UploadResultAsync(string experimentName, IExperimentResult result)
         {
             string outputFile = result.OutputFiles[0];
+            result.OutputFileUrl = experimentName;
 
             // Initialize the BlobServiceClient and BlobContainerClient
             BlobServiceClient blobServiceClient = new BlobServiceClient(this._config.StorageConnectionString);
-            BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(this._config.ResultContainer);
+            BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(this._config.ResultContainer);   
 
-            // Creating the container if it does not exist
             await containerClient.CreateIfNotExistsAsync();
 
-            // Get a reference to the blob
-            BlobClient blobClient = containerClient.GetBlobClient($"{experimentName}/{Path.GetFileName(outputFile)}");
-
-            // Upload the file to the blob
+            BlobClient blobClient = containerClient.GetBlobClient($"{Path.GetFileName(outputFile)}");
+         
             await blobClient.UploadAsync(outputFile, overwrite: true);
 
 
