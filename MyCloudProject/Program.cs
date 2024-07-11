@@ -53,14 +53,13 @@ namespace MyCloudProject
             {
                 // Wait for the queue message
                 IExerimentRequest request = await storageProvider.ReceiveExperimentRequestAsync(tokeSrc.Token);
-
-                // Method to set the messaga parameters to Experiment class
-                experiment.setExperimentDetails(request.ExperimentId, request.Name, request.Description);
-           
+             
                 if (request != null)
                 {
                     try
                     {
+                        // Method to set the messaga parameters to Experiment class
+                        experiment.setExperimentDetails(request.ExperimentId, request.Name, request.Description);
 
                         logger?.LogInformation($"The message with Id: {request.ExperimentId} is received. " +
                             $"The dataset will be downloaded from Blob storage.");
