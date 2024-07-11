@@ -107,8 +107,11 @@ namespace MyExperiment
                 TableClient tableClient = tableServiceClient.GetTableClient(tableName: this._config.ResultTable);
                 await tableClient.CreateIfNotExistsAsync();
 
+                // Generate a unique RowKey
+                string uniqueRowKey = Guid.NewGuid().ToString();
+
                 // Creating a table entity from the result
-                var entity = new TableEntity( this._config.ResultTable, "KnnClassifier")
+                var entity = new TableEntity( this._config.ResultTable, uniqueRowKey)
              {
                 { "StartTimeUtc", result.StartTimeUtc },
                 { "EndTimeUtc", result.EndTimeUtc },
