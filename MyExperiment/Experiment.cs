@@ -65,13 +65,12 @@ namespace MyExperiment
 
             res.StartTimeUtc = DateTime.UtcNow;
 
-            // Add a trace listener to capture debug output
+            // Console output to outpufile
             using (StreamWriter writer = new StreamWriter(outputFile))
             {
-                Trace.Listeners.Add(new TextWriterTraceListener(writer));
-                Trace.AutoFlush = true;
+                Console.SetOut(writer);
                 experiment.Run(sequences.Train);
-
+                writer.Flush();
             }         
 
             res.Timestamp = DateTime.UtcNow;
