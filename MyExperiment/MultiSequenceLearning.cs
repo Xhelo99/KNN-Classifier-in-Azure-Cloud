@@ -18,7 +18,7 @@ namespace MyExperiment
         /// <summary>
         /// Runs the learning of sequences.
         /// </summary>
-        /// <param name="sequences">Dictionary of sequences. KEY is the sewuence name, the VALUE is th elist of element of the sequence.</param>
+        /// <param name="sequences">Dictionary of sequences. KEY is the sequence name, VALUE is the list of elements of the sequence.</param>
         public Predictor Run(Dictionary<string, List<double>> sequences)
         {
             Console.WriteLine($"Hello NeocortexApi! Experiment {nameof(MultiSequenceLearning)}");
@@ -99,10 +99,10 @@ namespace MyExperiment
             {
                 if (isStable)
                     // Event should be fired when entering the stable state.
-                    Debug.WriteLine($"STABLE: Patterns: {numPatterns}, Inputs: {seenInputs}, iteration: {seenInputs / numPatterns}");
+                    Console.WriteLine($"STABLE: Patterns: {numPatterns}, Inputs: {seenInputs}, iteration: {seenInputs / numPatterns}");
                 else
                     // Ideal SP should never enter unstable state after stable state.
-                    Debug.WriteLine($"INSTABLE: Patterns: {numPatterns}, Inputs: {seenInputs}, iteration: {seenInputs / numPatterns}");
+                    Console.WriteLine($"INSTABLE: Patterns: {numPatterns}, Inputs: {seenInputs}, iteration: {seenInputs / numPatterns}");
 
                 // We are not learning in instable state.
                 isInStableState = isStable;
@@ -117,10 +117,10 @@ namespace MyExperiment
             tm.Init(mem);
 
             // Please note that we do not add here TM in the layer.
-            // This is omitted for practical reasons, because we first eneter the newborn-stage of the algorithm
-            // In this stage we want that SP get boosted and see all elements before we start learning with TM.
+            // This is omitted for practical reasons, because we first enter the newborn-stage of the algorithm
+            // In this stage we want SP to get boosted and see all elements before we start learning with TM.
             // All would also work fine with TM in layer, but it would work much slower.
-            // So, to improve the speed of experiment, we first ommit the TM and then after the newborn-stage we add it to the layer.
+            // So, to improve the speed of experiment, we first omit the TM and then after the newborn-stage we add it to the layer.
             layer1.HtmModules.Add("encoder", encoder);
             layer1.HtmModules.Add("sp", sp);
 
@@ -144,13 +144,13 @@ namespace MyExperiment
 
                 cycle++;
 
-                Debug.WriteLine($"-------------- Newborn Cycle {cycle} ---------------");
+                Console.WriteLine($"-------------- Newborn Cycle {cycle} ---------------");
 
                 foreach (var inputs in sequences)
                 {
                     foreach (var input in inputs.Value)
                     {
-                        Debug.WriteLine($" -- {inputs.Key} - {input} --");
+                        Console.WriteLine($" -- {inputs.Key} - {input} --");
 
                         var lyrOut = layer1.Compute(input, true);
 
@@ -173,7 +173,7 @@ namespace MyExperiment
             // Loop over all sequences.
             foreach (var sequenceKeyPair in sequences)
             {
-                Debug.WriteLine($"-------------- Sequences {sequenceKeyPair.Key} ---------------");
+                Console.WriteLine($"-------------- Sequences {sequenceKeyPair.Key} ---------------");
 
                 int maxPrevInputs = sequenceKeyPair.Value.Count - 1;
 
@@ -181,7 +181,7 @@ namespace MyExperiment
 
                 previousInputs.Add("-1.0");
 
-                // Set on true if the system has learned the sequence with a maximum acurracy.
+                // Set to true if the system has learned the sequence with maximum accuracy.
                 bool isLearningCompleted = false;
 
                 //
@@ -192,14 +192,14 @@ namespace MyExperiment
 
                     cycle++;
 
-                    Debug.WriteLine("");
+                    Console.WriteLine("");
 
-                    Debug.WriteLine($"-------------- Cycle {cycle} ---------------");
-                    Debug.WriteLine("");
+                    Console.WriteLine($"-------------- Cycle {cycle} ---------------");
+                    Console.WriteLine("");
 
                     foreach (var input in sequenceKeyPair.Value)
                     {
-                        Debug.WriteLine($"-------------- {input} ---------------");
+                        Console.WriteLine($"-------------- {input} ---------------");
 
                         var lyrOut = layer1.Compute(input, true) as ComputeCycle;
 
@@ -210,10 +210,10 @@ namespace MyExperiment
                             previousInputs.RemoveAt(0);
 
                         // In the pretrained SP with HPC, the TM will quickly learn cells for patterns
-                        // In that case the starting sequence 4-5-6 might have the sam SDR as 1-2-3-4-5-6,
-                        // Which will result in returning of 4-5-6 instead of 1-2-3-4-5-6.
-                        // HtmClassifier allways return the first matching sequence. Because 4-5-6 will be as first
-                        // memorized, it will match as the first one.
+                        // In that case, the starting sequence 4-5-6 might have the same SDR as 1-2-3-4-5-6,
+                        // which will result in returning 4-5-6 instead of 1-2-3-4-5-6.
+                        // HtmClassifier always returns the first matching sequence. Because 4-5-6 will be memorized first,
+                        // it will match as the first one.
                         if (previousInputs.Count < maxPrevInputs)
                             continue;
 
@@ -232,8 +232,8 @@ namespace MyExperiment
 
                         cls.Learn(key, actCells.ToArray());
 
-                        Debug.WriteLine($"Col  SDR: {Helpers.StringifyVector(lyrOut.ActivColumnIndicies)}");
-                        Debug.WriteLine($"Cell SDR: {Helpers.StringifyVector(actCells.Select(c => c.Index).ToArray())}");
+                        Console.WriteLine($"Col  SDR: {Helpers.StringifyVector(lyrOut.ActivColumnIndicies)}");
+                        Console.WriteLine($"Cell SDR: {Helpers.StringifyVector(actCells.Select(c => c.Index).ToArray())}");
 
                         //
                         // If the list of predicted values from the previous step contains the currently presenting value,
@@ -241,10 +241,10 @@ namespace MyExperiment
                         if (lastPredictedValues.Contains(key))
                         {
                             matches++;
-                            Debug.WriteLine($"Match. Actual value: {key} - Predicted value: {lastPredictedValues.FirstOrDefault(key)}.");
+                            Console.WriteLine($"Match. Actual value: {key} - Predicted value: {lastPredictedValues.FirstOrDefault(key)}.");
                         }
                         else
-                            Debug.WriteLine($"Missmatch! Actual value: {key} - Predicted values: {String.Join(',', lastPredictedValues)}");
+                            Console.WriteLine($"Mismatch! Actual value: {key} - Predicted values: {String.Join(',', lastPredictedValues)}");
 
                         if (lyrOut.PredictiveCells.Count > 0)
                         {
@@ -253,55 +253,55 @@ namespace MyExperiment
 
                             foreach (var item in predictedInputValues)
                             {
-                                Debug.WriteLine($"Current Input: {input} \t| Predicted Input: {item.PredictedInput} - {item.Similarity}");
+                                Console.WriteLine($"Current Input: {input} \t| Predicted Input: {item.PredictedInput} - {item.Similarity}");
                             }
 
                             lastPredictedValues = predictedInputValues.Select(v => v.PredictedInput).ToList();
                         }
                         else
                         {
-                            Debug.WriteLine($"NO CELLS PREDICTED for next cycle.");
+                            Console.WriteLine($"NO CELLS PREDICTED for next cycle.");
                             lastPredictedValues = new List<string>();
                         }
                     }
 
                     // The first element (a single element) in the sequence cannot be predicted
-                    double maxPossibleAccuraccy = (double)((double)sequenceKeyPair.Value.Count - 1) / (double)sequenceKeyPair.Value.Count * 100.0;
+                    double maxPossibleAccuracy = (double)((double)sequenceKeyPair.Value.Count - 1) / (double)sequenceKeyPair.Value.Count * 100.0;
 
                     accuracy = (double)matches / (double)sequenceKeyPair.Value.Count * 100.0;
 
-                    Debug.WriteLine($"Cycle: {cycle}\tMatches={matches} of {sequenceKeyPair.Value.Count}\t {accuracy}%");
+                    Console.WriteLine($"Cycle: {cycle}\tMatches={matches} of {sequenceKeyPair.Value.Count}\t {accuracy}%");
 
-                    if (accuracy >= maxPossibleAccuraccy)
+                    if (accuracy >= maxPossibleAccuracy)
                     {
                         maxMatchCnt++;
-                        Debug.WriteLine($"100% accuracy reched {maxMatchCnt} times.");
+                        Console.WriteLine($"100% accuracy reached {maxMatchCnt} times.");
 
                         //
-                        // Experiment is completed if we are 30 cycles long at the 100% accuracy.
+                        // Experiment is completed if we are 30 cycles long at 100% accuracy.
                         if (maxMatchCnt >= 30)
                         {
                             sw.Stop();
-                            Debug.WriteLine($"Sequence learned. The algorithm is in the stable state after 30 repeats with with accuracy {accuracy} of maximum possible {maxMatchCnt}. Elapsed sequence {sequenceKeyPair.Key} learning time: {sw.Elapsed}.");
+                            Console.WriteLine($"Sequence learned. The algorithm is in the stable state after 30 repeats with accuracy {accuracy} of maximum possible {maxMatchCnt}. Elapsed sequence {sequenceKeyPair.Key} learning time: {sw.Elapsed}.");
                             isLearningCompleted = true;
                             break;
                         }
                     }
                     else if (maxMatchCnt > 0)
                     {
-                        Debug.WriteLine($"At 100% accuracy after {maxMatchCnt} repeats we get a drop of accuracy with accuracy {accuracy}. This indicates instable state. Learning will be continued.");
+                        Console.WriteLine($"At 100% accuracy after {maxMatchCnt} repeats we get a drop of accuracy with accuracy {accuracy}. This indicates unstable state. Learning will be continued.");
                         maxMatchCnt = 0;
                     }
 
-                    // This resets the learned state, so the first element starts allways from the beginning.
+                    // This resets the learned state, so the first element starts always from the beginning.
                     tm.Reset(mem);
                 }
 
                 if (isLearningCompleted == false)
-                    throw new Exception($"The system didn't learn with expected acurracy!");
+                    throw new Exception($"The system didn't learn with expected accuracy!");
             }
 
-            Debug.WriteLine("------------ END ------------");
+            Console.WriteLine("------------ END ------------");
 
             return new Predictor(layer1, mem, cls);
         }
@@ -310,7 +310,7 @@ namespace MyExperiment
         /// <summary>
         /// Gets the number of all unique inputs.
         /// </summary>
-        /// <param name="sequences">Alle sequences.</param>
+        /// <param name="sequences">All sequences.</param>
         /// <returns></returns>
         private int GetNumberOfInputs(Dictionary<string, List<double>> sequences)
         {
@@ -327,8 +327,8 @@ namespace MyExperiment
 
 
         /// <summary>
-        /// Constracts the unique key of the element of an sequece. This key is used as input for HtmClassifier.
-        /// It makes sure that alle elements that belong to the same sequence are prefixed with the sequence.
+        /// Constructs the unique key of the element of a sequence. This key is used as input for HtmClassifier.
+        /// It makes sure that all elements that belong to the same sequence are prefixed with the sequence.
         /// The prediction code can then extract the sequence prefix to the predicted element.
         /// </summary>
         /// <param name="prevInputs"></param>
