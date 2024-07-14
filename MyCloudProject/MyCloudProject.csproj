@@ -5,6 +5,8 @@
     <TargetFramework>net8.0</TargetFramework>
  
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+ 
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
