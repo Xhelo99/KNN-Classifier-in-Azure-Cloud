@@ -58,3 +58,77 @@ When we tested our KNN implementation with the cloned Neocortex API, the program
 To resolve this, we first cloned the NeocortexAPI repository and added the `IClassifierKnn.cs` file. Then, we created a NuGet package as shown in the image below. (Note: You can add the image later.)
 
 Next, we installed the NuGet package as shown in the image below. (Note: You can add the image later.) This was the change we made to our SE project. Afterward, we tested our KNN classifier implementation, and everything worked fine. Now, we are ready to deploy it in the Azure Cloud.
+
+### Cloud Project 
+Now we can start with cloud project. First you have to get the cloud project from [MyCloudProjectSample](https://github.com/UniversityOfAppliedSciencesFrankfurt/se-cloud-2023-2024/tree/main/Source/MyCloudProjectSample). Then we start to modify the project step by step. 
+#### Receive the message from Queue
+
+We implemented the method in the `AzureStorageProvider` class to receive a message from the queue.
+
+```csharp
+public async Task<IExerimentRequest> ReceiveExperimentRequestAsync(CancellationToken token)
+{
+    QueueClient queueClient = new QueueClient(this._config.StorageConnectionString, this._config.Queue);
+
+    // Receive a message from the queue
+    QueueMessage message = await queueClient.ReceiveMessageAsync();
+
+    if (message != null)
+    {
+        try
+        {
+            // Processing of the received message
+            string msgTxt = Encoding.UTF8.GetString(message.Body.ToArray());
+            ExerimentRequestMessage request = JsonSerializer.Deserialize<ExerimentRequestMessage>(msgTxt);
+            request.MessageId = message.MessageId;
+            request.MessageReceipt = message.PopReceipt;
+            return request;
+        }
+        catch (JsonException jsonEx)
+        {
+            logger?.LogError(jsonEx, "JSON deserialization failed for the message");
+            Console.Error.WriteLine("The message sent is not correctly formatted. Please send another message.");
+        }
+    }
+    else
+    {
+        this.logger?.LogInformation("The message is null");
+    }
+
+    return null;
+}
+```
+When the following json message is given to the Queue:
+
+```bash
+{
+   "ExperimentId": "1",
+   "Name": "KNN Classifier",
+   "Description": "A description of choice",
+   "InputFile": "New Text Document.txt"
+}
+```
+This method receives it and processes it. The name of the dataset (InputFile) is passed as a parameter to the next method which downloads the dataset from Blob storage. 
+Two dataset files can be downloaded. One is the large dataset LargeDataset.txt with 100 sequences and the other is SmallDataset.txt with only 
+one sequence. The small dataset is used to test the functionality of the project.
+
+#### Download the dataset from Blob storage
+Next step is to implement the method that download the dataset from blob: 
+
+```csharp
+  // Download the dataset from my blob storage
+  public async Task<string> DownloadInputAsync(string fileName)
+  {
+      BlobContainerClient container = new BlobContainerClient(_config.StorageConnectionString, _config.TrainingContainer);
+      await container.CreateIfNotExistsAsync();
+
+      // Geting a reference to a blob by its name.
+      BlobClient blob = container.GetBlobClient(fileName);
+
+      // Downloading the blob to the specified local file.
+      await blob.DownloadToAsync(fileName);
+
+      return fileName;
+  }
+```
+The dataset file is returned and next we are ready to run the SE experiment.
