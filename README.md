@@ -57,7 +57,9 @@ To resolve this, we first cloned the NeocortexAPI repository and added the `ICla
 ![Image1](Documentation/images/Capture1.PNG)
 
 Next, we installed the NuGet package:
+
 ![Image2](Documentation/images/Capture2.PNG)
+
 This was the change we made to our SE project. Afterward, we tested our KNN classifier implementation, and everything worked fine. Now, we are ready to deploy it in the Azure Cloud.
 
 ### Cloud Project 
@@ -260,3 +262,4 @@ Now there is only one method that needs to be implemented and that's to delete t
 Here we take the `MessageId` and the `MessageReceipt` from the message that was sent from the Queue. After completing these methods, we only added logging in to the `Program.cs` tested the program for runtime errors, and improved it. 
 
 ## Azure Deployment
+Shtoje edhe Azure Deploymen o joni qela. 
