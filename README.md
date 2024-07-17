@@ -132,3 +132,51 @@ Next step is to implement the method that download the dataset from blob:
   }
 ```
 The dataset file is returned and next we are ready to run the SE experiment.
+### Run the SE experiment
+To run the SE project we modify the Experiments class inside the MyExperiment project. We have 
+Implemented the method that runs the experiment as follow: 
+```csharp
+  public Task<IExperimentResult> RunAsync(string inputData)
+  {
+      // Create output file 
+      var outputFile = "output.txt";
+
+      // Read  inputData file
+      var text = File.ReadAllText(inputData, Encoding.UTF8);
+      var sequences = JsonSerializer.Deserialize<Test>(text);
+      
+
+      //  This creates an instance of MultiSequenceLearning and run the method
+      MultiSequenceLearning experiment = new MultiSequenceLearning();
+
+      ExperimentResult res = new ExperimentResult(this.config.GroupId, "1");
+
+      res.StartTimeUtc = DateTime.UtcNow;
+
+      // Console output to outpufile
+      using (StreamWriter writer = new StreamWriter(outputFile))
+      {
+          Console.SetOut(writer);
+          experiment.Run(sequences.Train);
+          writer.Flush();
+      }         
+
+      res.Timestamp = DateTime.UtcNow;
+      res.EndTimeUtc = DateTime.UtcNow;
+      res.ExperimentId = experimentId;
+      res.Name = experimentName;
+      res.Description = experimentDescription;
+      var elapsedTime = res.EndTimeUtc - res.StartTimeUtc;
+      res.DurationSec = (long)elapsedTime.GetValueOrDefault().TotalSeconds;
+      res.InputFileUrl = inputData;
+      res.OutputFileUrl = outputFile;
+      res.Accuracy = experiment.accuracy;
+      res.OutputFiles = new string[] { outputFile };
+      
+
+      return Task.FromResult<IExperimentResult>(res); 
+  }
+```
+This code run the MultiSequenceLearning of the NeoCortexApi, which is implemented to use our Knn classifier. The results of the experiment are returned. Some of the parameters 
+are taken from the initial message we send from the Queue message and Accuracy is taken from experiment result accuracy. The output console of experiment is save as output.txt
+and is given the next method which upload that to the output blob container. 
