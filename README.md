@@ -57,7 +57,6 @@ To resolve this, we first cloned the NeocortexAPI repository and added the `ICla
 ![Image1](Documentation/images/Capture1.PNG)
 
 Next, we installed the NuGet package:
-
 ![Image2](Documentation/images/Capture2.PNG)
 
 This was the change we made to our SE project. Afterward, we tested our KNN classifier implementation, and everything worked fine. Now, we are ready to deploy it in the Azure Cloud.
