@@ -262,3 +262,4 @@ Now there is only one method that needs to be implemented and that's to delete t
 Here we take the `MessageId` and the `MessageReceipt` from the message that was sent from the Queue. After completing these methods, we only added logging in to the `Program.cs` tested the program for runtime errors, and improved it. 
 
 ## Azure Deployment
+Shtoje edhe Azure Deploymen o joni qela. 
