@@ -1,6 +1,4 @@
-﻿using NeoCortexApi.Encoders;
-using NeoCortexApi.Entities;
-using NeoCortexApi.Network;
+﻿using NeoCortexApi.Entities;
 using NeoCortexApi;
 using System;
 using System.Collections.Generic;
@@ -8,17 +6,20 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NeoCortexApi.Classifiers;
+using NeoCortexApi.Encoders;
+using NeoCortexApi.Network;
 
 namespace MyExperiment
 {
+
     public class MultiSequenceLearning
     {
         public double accuracy;
-
         /// <summary>
         /// Runs the learning of sequences.
         /// </summary>
-        /// <param name="sequences">Dictionary of sequences. KEY is the sequence name, VALUE is the list of elements of the sequence.</param>
+        /// <param name="sequences">Dictionary of sequences. KEY is the sewuence name, the VALUE is th elist of element of the sequence.</param>
         public Predictor Run(Dictionary<string, List<double>> sequences)
         {
             Console.WriteLine($"Hello NeocortexApi! Experiment {nameof(MultiSequenceLearning)}");
@@ -43,7 +44,7 @@ namespace MyExperiment
                 MaxSynapsesPerSegment = (int)(0.02 * numColumns),
 
                 ActivationThreshold = 15,
-                ConnectedPermanence = 0.5,
+                //ConnectedPermanence = 0.5,
 
                 // Learning is slower than forgetting in this case.
                 PermanenceDecrement = 0.25,
@@ -86,7 +87,8 @@ namespace MyExperiment
 
             bool isInStableState = false;
 
-            KnnClassifier<string, ComputeCycle> cls = new KnnClassifier<string, ComputeCycle>();
+            // HtmClassifier<string, ComputeCycle> cls = new HtmClassifier<string, ComputeCycle>();
+            var cls = new KnnClassifier<string, ComputeCycle>();
 
             var numUniqueInputs = GetNumberOfInputs(sequences);
 
@@ -117,10 +119,10 @@ namespace MyExperiment
             tm.Init(mem);
 
             // Please note that we do not add here TM in the layer.
-            // This is omitted for practical reasons, because we first enter the newborn-stage of the algorithm
-            // In this stage we want SP to get boosted and see all elements before we start learning with TM.
+            // This is omitted for practical reasons, because we first eneter the newborn-stage of the algorithm
+            // In this stage we want that SP get boosted and see all elements before we start learning with TM.
             // All would also work fine with TM in layer, but it would work much slower.
-            // So, to improve the speed of experiment, we first omit the TM and then after the newborn-stage we add it to the layer.
+            // So, to improve the speed of experiment, we first ommit the TM and then after the newborn-stage we add it to the layer.
             layer1.HtmModules.Add("encoder", encoder);
             layer1.HtmModules.Add("sp", sp);
 
@@ -181,7 +183,7 @@ namespace MyExperiment
 
                 previousInputs.Add("-1.0");
 
-                // Set to true if the system has learned the sequence with maximum accuracy.
+                // Set on true if the system has learned the sequence with a maximum acurracy.
                 bool isLearningCompleted = false;
 
                 //
@@ -210,10 +212,10 @@ namespace MyExperiment
                             previousInputs.RemoveAt(0);
 
                         // In the pretrained SP with HPC, the TM will quickly learn cells for patterns
-                        // In that case, the starting sequence 4-5-6 might have the same SDR as 1-2-3-4-5-6,
-                        // which will result in returning 4-5-6 instead of 1-2-3-4-5-6.
-                        // HtmClassifier always returns the first matching sequence. Because 4-5-6 will be memorized first,
-                        // it will match as the first one.
+                        // In that case the starting sequence 4-5-6 might have the sam SDR as 1-2-3-4-5-6,
+                        // Which will result in returning of 4-5-6 instead of 1-2-3-4-5-6.
+                        // HtmClassifier allways return the first matching sequence. Because 4-5-6 will be as first
+                        // memorized, it will match as the first one.
                         if (previousInputs.Count < maxPrevInputs)
                             continue;
 
@@ -244,7 +246,7 @@ namespace MyExperiment
                             Console.WriteLine($"Match. Actual value: {key} - Predicted value: {lastPredictedValues.FirstOrDefault(key)}.");
                         }
                         else
-                            Console.WriteLine($"Mismatch! Actual value: {key} - Predicted values: {String.Join(',', lastPredictedValues)}");
+                            Console.WriteLine($"Missmatch! Actual value: {key} - Predicted values: {String.Join(',', lastPredictedValues)}");
 
                         if (lyrOut.PredictiveCells.Count > 0)
                         {
@@ -266,39 +268,39 @@ namespace MyExperiment
                     }
 
                     // The first element (a single element) in the sequence cannot be predicted
-                    double maxPossibleAccuracy = (double)((double)sequenceKeyPair.Value.Count - 1) / (double)sequenceKeyPair.Value.Count * 100.0;
+                    double maxPossibleAccuraccy = (double)((double)sequenceKeyPair.Value.Count - 1) / (double)sequenceKeyPair.Value.Count * 100.0;
 
                     accuracy = (double)matches / (double)sequenceKeyPair.Value.Count * 100.0;
 
-                    Console.WriteLine($"Cycle: {cycle}\tMatches={matches} of {sequenceKeyPair.Value.Count}\t {accuracy}%");
+                    Console.WriteLine($"Cycle: {cycle}\tMatches={matches} of {sequenceKeyPair.Value.Count}\t {accuracy}");
 
-                    if (accuracy >= maxPossibleAccuracy)
+                    if (accuracy >= maxPossibleAccuraccy)
                     {
                         maxMatchCnt++;
-                        Console.WriteLine($"100% accuracy reached {maxMatchCnt} times.");
+                        Console.WriteLine($"100% accuracy reched {maxMatchCnt} times.");
 
                         //
-                        // Experiment is completed if we are 30 cycles long at 100% accuracy.
+                        // Experiment is completed if we are 30 cycles long at the 100% accuracy.
                         if (maxMatchCnt >= 30)
                         {
                             sw.Stop();
-                            Console.WriteLine($"Sequence learned. The algorithm is in the stable state after 30 repeats with accuracy {accuracy} of maximum possible {maxMatchCnt}. Elapsed sequence {sequenceKeyPair.Key} learning time: {sw.Elapsed}.");
+                            Console.WriteLine($"Sequence learned. The algorithm is in the stable state after 30 repeats with with accuracy {accuracy} of maximum possible {maxMatchCnt}. Elapsed sequence {sequenceKeyPair.Key} learning time: {sw.Elapsed}.");
                             isLearningCompleted = true;
                             break;
                         }
                     }
                     else if (maxMatchCnt > 0)
                     {
-                        Console.WriteLine($"At 100% accuracy after {maxMatchCnt} repeats we get a drop of accuracy with accuracy {accuracy}. This indicates unstable state. Learning will be continued.");
+                        Console.WriteLine($"At 100% accuracy after {maxMatchCnt} repeats we get a drop of accuracy with accuracy {accuracy}. This indicates instable state. Learning will be continued.");
                         maxMatchCnt = 0;
                     }
 
-                    // This resets the learned state, so the first element starts always from the beginning.
+                    // This resets the learned state, so the first element starts allways from the beginning.
                     tm.Reset(mem);
                 }
 
                 if (isLearningCompleted == false)
-                    throw new Exception($"The system didn't learn with expected accuracy!");
+                    throw new Exception($"The system didn't learn with expected acurracy!");
             }
 
             Console.WriteLine("------------ END ------------");
@@ -310,7 +312,7 @@ namespace MyExperiment
         /// <summary>
         /// Gets the number of all unique inputs.
         /// </summary>
-        /// <param name="sequences">All sequences.</param>
+        /// <param name="sequences">Alle sequences.</param>
         /// <returns></returns>
         private int GetNumberOfInputs(Dictionary<string, List<double>> sequences)
         {
@@ -327,8 +329,8 @@ namespace MyExperiment
 
 
         /// <summary>
-        /// Constructs the unique key of the element of a sequence. This key is used as input for HtmClassifier.
-        /// It makes sure that all elements that belong to the same sequence are prefixed with the sequence.
+        /// Constracts the unique key of the element of an sequece. This key is used as input for HtmClassifier.
+        /// It makes sure that alle elements that belong to the same sequence are prefixed with the sequence.
         /// The prediction code can then extract the sequence prefix to the predicted element.
         /// </summary>
         /// <param name="prevInputs"></param>
