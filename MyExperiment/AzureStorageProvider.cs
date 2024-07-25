@@ -53,7 +53,6 @@ namespace MyExperiment
 
             return fileName;
 
-
         }
 
         // Await the queue message and process it 

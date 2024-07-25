@@ -68,7 +68,6 @@ namespace MyExperiment
             // Console output to outpufile
             using (StreamWriter writer = new StreamWriter(outputFile))
             {
-                Console.WriteLine("Hello NeocortexApi! Experiment Multi Sequence Learning started.");
                 Console.SetOut(writer);
                 experiment.Run(sequences.Train);
                 writer.Flush();

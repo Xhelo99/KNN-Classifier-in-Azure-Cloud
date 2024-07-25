@@ -9,6 +9,7 @@ using Azure.Storage.Queues.Models;
 using Azure.Storage.Queues;
 using System.Text.Json;
 using System.Text;
+using NeoCortexApi.Entities;
 
 namespace MyCloudProject
 {
@@ -69,6 +70,8 @@ namespace MyCloudProject
           
                         logger?.LogInformation($"The dataset {localFileWithInputArgs} has successfully been downloaded. " +
                             $"The SE project will start.");
+
+                        logger?.LogInformation("Hello NeoCortexApi! Multisequence Experiment started...");
 
                         // Run SE Project code
                         IExperimentResult result = await experiment.RunAsync(localFileWithInputArgs);
