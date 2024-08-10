@@ -39,7 +39,6 @@ namespace MyExperiment
         public string InputFileUrl { get; set; }
 
         public string[] OutputFiles { get; set; }
-        // Your properties related to experiment.
 
         public double Accuracy { get; set; }
 

@@ -15,7 +15,8 @@ using System.Diagnostics;
 namespace MyExperiment
 {
     /// <summary>
-    /// This class implements the ML experiment that will run in the cloud. This is refactored code from my SE project.
+    /// This class implements a machine learning experiment that will run in the cloud.
+    /// It is refactored from a previous software engineering project.
     /// </summary>
     public class Experiment : IExperiment
     {
@@ -38,16 +39,25 @@ namespace MyExperiment
             config = new MyConfig();
             configSection.Bind(config);               
         }
-       
-         // Method to set experiment details
-       public void setExperimentDetails(string experimentId, string experimentName, string experimentDescription) 
+
+        /// <summary>
+        /// Sets the experiment details such as ID, name, and description.
+        /// </summary>
+        /// <param name="experimentId">The unique identifier for the experiment.</param>
+        /// <param name="experimentName">The name of the experiment.</param>
+        /// <param name="experimentDescription">A brief description of the experiment.</param>
+        public void setExperimentDetails(string experimentId, string experimentName, string experimentDescription) 
         {
             this.experimentId = experimentId;
             this.experimentName = experimentName;
             this.experimentDescription = experimentDescription;
         }
 
-
+        /// <summary>
+        /// Runs the experiment asynchronously and returns the experiment results.
+        /// </summary>
+        /// <param name="inputData">The path to the input data file.</param>
+        /// <returns>A task representing the asynchronous operation, containing the experiment results.</returns>
         public Task<IExperimentResult> RunAsync(string inputData)
         {
             // Create output file 
@@ -86,7 +96,7 @@ namespace MyExperiment
             res.OutputFiles = new string[] { outputFile };
             
 
-            return Task.FromResult<IExperimentResult>(res); // TODO...
+            return Task.FromResult<IExperimentResult>(res); 
         }
     }
 }

@@ -8,83 +8,107 @@ using System.Threading.Tasks;
 
 namespace MyExperiment
 {
-    // Define a generic K-nearest neighbors (KNN) classifier class
+    /// <summary>
+    /// Defines a generic K-nearest neighbors (KNN) classifier class.
+    /// </summary>
     public class KnnClassifier<TInput, TOutput> : IClassifierKnn<string, ComputeCycle>
     {
-        // Dictionary to store training data
+        // Dictionary to store training data.
         private Dictionary<string, List<Cell[]>> trainingData;
-        private short k;  // Parameter for KNN
+        private short k;  // Parameter for KNN.
 
-        // Constructor to initialize training data dictionary and k value
+        /// <summary>
+        /// Constructor to initialize the training data dictionary and k value.
+        /// </summary>
+        /// <param name="k">The number of nearest neighbors to consider.</param>
         public KnnClassifier(short k = 3)
         {
             trainingData = new Dictionary<string, List<Cell[]>>();
             this.k = k;
         }
 
-        // Method to add new training data
+        /// <summary>
+        /// Adds new training data.
+        /// </summary>
+        /// <param name="input">The input label.</param>
+        /// <param name="output">The corresponding output (cell array).</param>
         public void Learn(string input, Cell[] output)
         {
-            // If input label is not present in training data, add a new entry
+            // If the input label is not present in the training data, add a new entry.
             if (!trainingData.ContainsKey(input))
             {
                 trainingData[input] = new List<Cell[]>();
             }
 
-            // Add the output (cell array) corresponding to the input label
+            // Add the output (cell array) corresponding to the input label.
             trainingData[input].Add(output);
         }
 
-        // Method to get predicted input values based on KNN algorithm with parameter k
+        /// <summary>
+        /// Gets predicted input values based on the KNN algorithm with the specified parameter k.
+        /// </summary>
+        /// <param name="predictiveCells">The predictive cells.</param>
+        /// <param name="k">The number of nearest neighbors to consider.</param>
+        /// <returns>A list of predicted input values and their similarities.</returns>
         public List<ClassifierResult<string>> GetPredictedInputValues(Cell[] predictiveCells, short k)
         {
-            // Dictionary to store distances between training samples and predictive cells
+            // Dictionary to store distances between training samples and predictive cells.
             var distances = new Dictionary<string, double>();
 
-            // Calculate distance between predictive cells and each training sample
+            // Calculate the distance between predictive cells and each training sample.
             foreach (var entry in trainingData)
             {
                 double distance = CalculateDistance(predictiveCells, entry.Value);
                 distances.Add(entry.Key, distance);
             }
 
-            // Sort distances in ascending order
+            // Sort distances in ascending order.
             var sortedDistances = distances.OrderBy(x => x.Value);
 
-            // Get top k distances
+            // Get the top k distances.
             var topDistances = sortedDistances.Take(k);
 
-            // List to store predicted input values and their similarities
+            // List to store predicted input values and their similarities.
             var results = new List<ClassifierResult<string>>();
 
-            // Iterate through top k distances and add predicted input values to results
+            // Iterate through the top k distances and add predicted input values to results.
             foreach (var kvp in topDistances)
             {
-                // Add predicted input value with its similarity (inverse of distance)
+                // Add predicted input value with its similarity (inverse of distance).
                 results.Add(new ClassifierResult<string> { PredictedInput = kvp.Key, Similarity = 1.0 - kvp.Value });
             }
 
             return results;
         }
 
-        // Method to classify based on KNN algorithm with parameter k
+        /// <summary>
+        /// Classifies based on the KNN algorithm with the specified parameter k.
+        /// </summary>
+        /// <param name="predictiveCells">The predictive cells.</param>
+        /// <param name="k">The number of nearest neighbors to consider (default is 1).</param>
+        /// <returns>The classified input value.</returns>
         public string Classify(Cell[] predictiveCells, short k = 1)
         {
-            // Get predicted input values using KNN with parameter k
+            // Get predicted input values using KNN with the specified parameter k.
             var predictedInputs = GetPredictedInputValues(predictiveCells, k);
-            // Return the first predicted input value
+            // Return the first predicted input value.
             return predictedInputs.FirstOrDefault()?.PredictedInput;
         }
 
-        // Method to perform majority voting among KNN predictions with parameter k
+        /// <summary>
+        /// Performs majority voting among KNN predictions with the specified parameter k.
+        /// </summary>
+        /// <param name="predictiveCells">The predictive cells.</param>
+        /// <param name="k">The number of nearest neighbors to consider (default is 1).</param>
+        /// <returns>The input value with the highest number of votes.</returns>
         public string Vote(Cell[] predictiveCells, short k = 1)
         {
-            // Get predicted input values using KNN with parameter k
+            // Get predicted input values using KNN with the specified parameter k.
             var predictedInputs = GetPredictedInputValues(predictiveCells, k);
-            // Dictionary to store votes for each predicted input value
+            // Dictionary to store votes for each predicted input value.
             var votes = new Dictionary<string, int>();
 
-            // Count votes for each predicted input value
+            // Count votes for each predicted input value.
             foreach (var result in predictedInputs)
             {
                 if (!votes.ContainsKey(result.PredictedInput))
@@ -93,10 +117,16 @@ namespace MyExperiment
                 votes[result.PredictedInput]++;
             }
 
-            // Return the predicted input value with the highest number of votes
+            // Return the predicted input value with the highest number of votes.
             return votes.OrderByDescending(v => v.Value).FirstOrDefault().Key;
         }
 
+        /// <summary>
+        /// Calculates the distance between the given input cells and the stored training data.
+        /// </summary>
+        /// <param name="input1">The first set of cells.</param>
+        /// <param name="input2">The list of training data cell arrays.</param>
+        /// <returns>The minimum distance.</returns>
         private double CalculateDistance(Cell[] input1, List<Cell[]> input2)
         {
             double minDistance = double.MaxValue;
@@ -111,7 +141,7 @@ namespace MyExperiment
                     distance += input1[i].Index == cellArray[i].Index ? 0 : 1;
                 }
 
-                // Handle the extra elements in the longer array
+                // Handle the extra elements in the longer array.
                 distance += Math.Abs(input1.Length - cellArray.Length);
 
                 if (distance < minDistance)
@@ -123,7 +153,9 @@ namespace MyExperiment
             return minDistance;
         }
 
-        // Method to clear the state of the classifier (clear training data)
+        /// <summary>
+        /// Clears the state of the classifier (clears the training data).
+        /// </summary>
         public void ClearState() => trainingData.Clear();
     }
 }
