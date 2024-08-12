@@ -66,10 +66,18 @@ namespace MyExperiment
             // Read  inputData file
             var text = File.ReadAllText(inputData, Encoding.UTF8);
             var sequences = JsonSerializer.Deserialize<Test>(text);
-            
+
 
             //  This creates an instance of MultiSequenceLearning and run the method
             MultiSequenceLearning experiment = new MultiSequenceLearning();
+
+            // These list are used to see how the prediction works.
+            // Predictor is traversing the list element by element. 
+            // By providing more elements to the prediction, the predictor delivers more precise result.
+            var list1 = new double[] { 1.0, 2.0, 3.0, 4.0, 2.0, 5.0 };
+            var list2 = new double[] { 2.0, 3.0, 4.0 };
+            var list3 = new double[] { 8.0, 1.0, 2.0 };
+
 
             ExperimentResult res = new ExperimentResult(this.config.GroupId, "1");
 
@@ -79,10 +87,44 @@ namespace MyExperiment
             using (StreamWriter writer = new StreamWriter(outputFile))
             {
                 Console.SetOut(writer);
-                experiment.Run(sequences.Train);
-                writer.Flush();
-            }         
+                var predictor = experiment.Run(sequences.Train);
 
+                predictor.Reset();
+                PredictNextElement(predictor, list1);
+
+                predictor.Reset();
+                PredictNextElement(predictor, list2);
+
+                predictor.Reset();
+                PredictNextElement(predictor, list3);
+                writer.Flush();
+            }
+
+            void PredictNextElement(Predictor predictor, double[] list)
+            {
+                Console.WriteLine("------------------------------");
+
+                foreach (var item in list)
+                {
+                    var res = predictor.Predict(item);
+
+                    if (res.Count > 0)
+                    {
+                        foreach (var pred in res)
+                        {
+                            Console.WriteLine($"{pred.PredictedInput} - {pred.Similarity}");
+                        }
+
+                        var tokens = res.First().PredictedInput.Split('_');
+                        var tokens2 = res.First().PredictedInput.Split('-');
+                        Console.WriteLine($"Predicted Sequence: {tokens[0]}, predicted next element {tokens2.Last()}");
+                    }
+                    else
+                        Console.WriteLine("Nothing predicted :(");
+                }
+
+                Console.WriteLine("------------------------------");
+            }
             res.Timestamp = DateTime.UtcNow;
             res.EndTimeUtc = DateTime.UtcNow;
             res.ExperimentId = experimentId;
