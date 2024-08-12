@@ -3,15 +3,13 @@ using NeoCortexApi.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MyExperiment
 {
     /// <summary>
     /// Defines a generic K-nearest neighbors (KNN) classifier class.
     /// </summary>
-    public class KnnClassifier<TInput, TOutput> : IClassifierKnn<string, ComputeCycle>
+    public class KnnClassifier<TInput, TOutput> : IClassifier<string, ComputeCycle>
     {
         // Dictionary to store training data.
         private Dictionary<string, List<Cell[]>> trainingData;
@@ -42,6 +40,30 @@ namespace MyExperiment
 
             // Add the output (cell array) corresponding to the input label.
             trainingData[input].Add(output);
+        }
+
+        /// <summary>
+        /// Gets the predicted input value based on the KNN algorithm with the default parameter k=1.
+        /// </summary>
+        /// <param name="predictiveCells">The predictive cells.</param>
+        /// <returns>The predicted input value.</returns>
+        public string GetPredictedInputValue(Cell[] predictiveCells)
+        {
+            return Classify(predictiveCells, 1);
+        }
+
+        /// <summary>
+        /// Gets predicted input values based on the KNN algorithm.
+        /// </summary>
+        /// <param name="cellIndices">The indices of the cells to predict.</param>
+        /// <param name="howMany">The number of nearest neighbors to consider.</param>
+        /// <returns>A list of predicted input values and their similarities.</returns>
+        public List<ClassifierResult<string>> GetPredictedInputValues(int[] cellIndices, short howMany = 1)
+        {
+            // Convert cell indices to an array of Cells (this is needed for compatibility with your existing methods).
+            Cell[] predictiveCells = cellIndices.Select(index => new Cell { Index = index }).ToArray();
+
+            return GetPredictedInputValues(predictiveCells, howMany);
         }
 
         /// <summary>
