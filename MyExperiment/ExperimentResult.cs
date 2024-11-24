@@ -7,6 +7,7 @@ using System.Text;
 
 namespace MyExperiment
 {
+
     public class ExperimentResult : ITableEntity, IExperimentResult
     {
         // Constructor to initialize the PartitionKey and RowKey, which are essential for identifying table entities in Azure Tables.
