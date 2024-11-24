@@ -1,3 +1,4 @@
+
 ﻿using MyCloudProject.Common;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ namespace MyExperiment
 {
     internal class ExerimentRequestMessage : IExerimentRequest
     {
+
         // Unique identifier for the experiment.
         public string ExperimentId { get; set; }
 
