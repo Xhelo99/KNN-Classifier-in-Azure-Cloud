@@ -1,3 +1,4 @@
+
 ﻿using NeoCortexApi.Classifiers;
 using NeoCortexApi.Entities;
 using NeoCortexApi.Network;
