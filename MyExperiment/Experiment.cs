@@ -1,3 +1,4 @@
+
 ﻿using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
 using Microsoft.Extensions.Configuration;
@@ -11,6 +12,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using System.Diagnostics;
+using NeoCortexApi;
+using System.Linq;
 
 namespace MyExperiment
 {
@@ -66,7 +69,7 @@ namespace MyExperiment
             // Read  inputData file
             var text = File.ReadAllText(inputData, Encoding.UTF8);
             var sequences = JsonSerializer.Deserialize<Test>(text);
-
+            
 
             //  This creates an instance of MultiSequenceLearning and run the method
             MultiSequenceLearning experiment = new MultiSequenceLearning();
@@ -125,6 +128,7 @@ namespace MyExperiment
 
                 Console.WriteLine("------------------------------");
             }
+
             res.Timestamp = DateTime.UtcNow;
             res.EndTimeUtc = DateTime.UtcNow;
             res.ExperimentId = experimentId;
