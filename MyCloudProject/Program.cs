@@ -1,3 +1,4 @@
+
 ﻿using MyCloudProject.Common;
 using System;
 using Microsoft.Extensions.Logging;
