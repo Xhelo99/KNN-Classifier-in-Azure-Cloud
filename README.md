@@ -9,7 +9,6 @@
 ## Contents
 
 *   [What is this?](#what-is-this)
-*   [Prerequisites SE Project](#prerequisites-se-project)
 *   [Project Architecture](#project-architecture)
 *   [Project Implementation](#project-implementation)
        * [Receive the message from Queue](#receive-the-message-from-queue)
@@ -36,13 +35,6 @@
 
 We will implement this project in a cloud environment, using thousands of sequences to train and evaluate the model. Some additional conditions need to be fulfilled,
 which will be explained further in this README.
- 
-
-## Prerequisites SE Project
-
-1. [Documentation](https://github.com/UniversityOfAppliedSciencesFrankfurt/se-cloud-2022-2023/tree/Team_Mariglen_Kejdjon/MySEProject/Documentation)
-2. [README](https://github.com/UniversityOfAppliedSciencesFrankfurt/se-cloud-2022-2023/blob/Team_Mariglen_Kejdjon/MySEProject/README.md)
-3. [Link to SE Project](https://github.com/UniversityOfAppliedSciencesFrankfurt/se-cloud-2022-2023/tree/Team_Mariglen_Kejdjon/MySEProject/MyProjectSample)
 
 ## Project Architecture
 In this section, we explore the foundational structure of our project, focusing on key components essential for effective design and operation. Our primary emphasis is seamlessly integrating and deploying the K-Nearest Neighbors (KNN) classifier within the Azure cloud ecosystem.
